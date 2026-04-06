@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    @apply border-graphite-800;
+  }
+
+  body {
+    @apply bg-graphite-950 text-graphite-100 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    @apply bg-accent-blue/30 text-white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-graphite-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-graphite-600;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-graphite-900/60 backdrop-blur-xl border border-graphite-800/50;
+  }
+
+  .glass-hover {
+    @apply glass transition-all duration-300 hover:bg-graphite-800/60 hover:border-graphite-700/50;
+  }
+
+  .card {
+    @apply glass rounded-xl p-6;
+  }
+
+  .card-interactive {
+    @apply glass-hover rounded-xl p-6 cursor-pointer;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-blue {
+    @apply badge bg-accent-blue/15 text-accent-blue border border-accent-blue/20;
+  }
+
+  .badge-emerald {
+    @apply badge bg-accent-emerald/15 text-accent-emerald border border-accent-emerald/20;
+  }
+
+  .badge-amber {
+    @apply badge bg-accent-amber/15 text-accent-amber border border-accent-amber/20;
+  }
+
+  .badge-rose {
+    @apply badge bg-accent-rose/15 text-accent-rose border border-accent-rose/20;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-graphite-200 to-graphite-400;
+  }
+
+  .section-heading {
+    @apply text-display-sm font-bold tracking-tight text-white;
+  }
+
+  .mono {
+    @apply font-mono text-sm tracking-tight;
+  }
+
+  .stat-value {
+    @apply font-mono text-2xl font-bold text-white tabular-nums;
+  }
+
+  .stat-label {
+    @apply text-xs uppercase tracking-wider text-graphite-400 font-medium;
+  }
+
+  .glow-line {
+    @apply h-px bg-gradient-to-r from-transparent via-accent-blue/50 to-transparent;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+}
