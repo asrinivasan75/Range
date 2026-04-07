@@ -39,3 +39,9 @@ out/
 .pytest_cache/
 htmlcov/
 .coverage
+data/phh-dataset/
+data/*.pkl
+data/pbt_snapshots/
+data/slumbot_*_log.json
+data/pbt_evolution.json
+data/slumbot_play_*_log.json

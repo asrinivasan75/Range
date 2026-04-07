@@ -1,0 +1,372 @@
+{
+  "evolution": [
+    {
+      "round": 1,
+      "population": "Q-Learn",
+      "replaced": "ql_v5",
+      "cloned_from": "ql_v6",
+      "best_rate": -3.6,
+      "worst_rate": -24.7,
+      "gap": 74.1,
+      "generation": 1,
+      "threshold": 60.0
+    },
+    {
+      "round": 1,
+      "population": "Q-Learn",
+      "replaced": "ql_v12",
+      "cloned_from": "ql_v4",
+      "best_rate": 49.4,
+      "worst_rate": -38.2,
+      "gap": 87.6,
+      "generation": 1,
+      "threshold": 60.0
+    },
+    {
+      "round": 2,
+      "population": "Q-Learn",
+      "replaced": "ql_v5",
+      "cloned_from": "ql_v12",
+      "best_rate": 64.0,
+      "worst_rate": -21.4,
+      "gap": 85.4,
+      "generation": 2,
+      "threshold": 58.5
+    },
+    {
+      "round": 3,
+      "population": "Q-Learn",
+      "replaced": "ql_v4",
+      "cloned_from": "ql_v12",
+      "best_rate": 96.7,
+      "worst_rate": 50.6,
+      "gap": 92.2,
+      "generation": 1,
+      "threshold": 57.1
+    },
+    {
+      "round": 3,
+      "population": "Q-Learn",
+      "replaced": "ql_v6",
+      "cloned_from": "ql_v5",
+      "best_rate": 142.8,
+      "worst_rate": 25.0,
+      "gap": 117.9,
+      "generation": 1,
+      "threshold": 57.1
+    },
+    {
+      "round": 4,
+      "population": "Q-Learn",
+      "replaced": "ql_v11",
+      "cloned_from": "ql_v5",
+      "best_rate": 75.3,
+      "worst_rate": 23.3,
+      "gap": 73.3,
+      "generation": 1,
+      "threshold": 55.6
+    },
+    {
+      "round": 4,
+      "population": "Q-Learn",
+      "replaced": "ql_v12",
+      "cloned_from": "ql_v4",
+      "best_rate": 96.6,
+      "worst_rate": 23.0,
+      "gap": 73.6,
+      "generation": 2,
+      "threshold": 55.6
+    },
+    {
+      "round": 5,
+      "population": "Q-Learn",
+      "replaced": "ql_v4",
+      "cloned_from": "ql_v11",
+      "best_rate": 94.7,
+      "worst_rate": 51.4,
+      "gap": 60.0,
+      "generation": 2,
+      "threshold": 54.2
+    },
+    {
+      "round": 5,
+      "population": "Q-Learn",
+      "replaced": "ql_v6",
+      "cloned_from": "ql_v5",
+      "best_rate": 111.4,
+      "worst_rate": 48.3,
+      "gap": 63.1,
+      "generation": 2,
+      "threshold": 54.2
+    },
+    {
+      "round": 7,
+      "population": "Q-Learn",
+      "replaced": "ql_v4",
+      "cloned_from": "ql_v5",
+      "best_rate": 116.1,
+      "worst_rate": 55.8,
+      "gap": 60.3,
+      "generation": 3,
+      "threshold": 51.2
+    },
+    {
+      "round": 7,
+      "population": "Q-Learn",
+      "replaced": "ql_v12",
+      "cloned_from": "ql_v11",
+      "best_rate": 56.8,
+      "worst_rate": 11.5,
+      "gap": 104.5,
+      "generation": 3,
+      "threshold": 51.2
+    },
+    {
+      "round": 7,
+      "population": "Q-Learn",
+      "replaced": "ql_v6",
+      "cloned_from": "ql_v5",
+      "best_rate": 116.1,
+      "worst_rate": -27.4,
+      "gap": 143.5,
+      "generation": 3,
+      "threshold": 51.2
+    },
+    {
+      "round": 8,
+      "population": "Q-Learn",
+      "replaced": "ql_v5",
+      "cloned_from": "ql_v6",
+      "best_rate": 148.2,
+      "worst_rate": 46.5,
+      "gap": 101.8,
+      "generation": 3,
+      "threshold": 49.8
+    },
+    {
+      "round": 8,
+      "population": "Q-Learn",
+      "replaced": "ql_v12",
+      "cloned_from": "ql_v11",
+      "best_rate": 51.7,
+      "worst_rate": 8.1,
+      "gap": 140.1,
+      "generation": 4,
+      "threshold": 49.8
+    },
+    {
+      "round": 8,
+      "population": "Q-Learn",
+      "replaced": "ql_v4",
+      "cloned_from": "ql_v6",
+      "best_rate": 148.2,
+      "worst_rate": 6.8,
+      "gap": 141.4,
+      "generation": 4,
+      "threshold": 49.8
+    },
+    {
+      "round": 10,
+      "population": "Q-Learn",
+      "replaced": "ql_v12",
+      "cloned_from": "ql_v11",
+      "best_rate": 125.9,
+      "worst_rate": 33.6,
+      "gap": 92.3,
+      "generation": 5,
+      "threshold": 46.9
+    },
+    {
+      "round": 10,
+      "population": "Q-Learn",
+      "replaced": "ql_v5",
+      "cloned_from": "ql_v6",
+      "best_rate": 51.7,
+      "worst_rate": 22.8,
+      "gap": 103.1,
+      "generation": 4,
+      "threshold": 46.9
+    },
+    {
+      "round": 10,
+      "population": "Q-Learn",
+      "replaced": "ql_v4",
+      "cloned_from": "ql_v11",
+      "best_rate": 125.9,
+      "worst_rate": 14.5,
+      "gap": 111.4,
+      "generation": 5,
+      "threshold": 46.9
+    },
+    {
+      "round": 11,
+      "population": "Q-Learn",
+      "replaced": "ql_v12",
+      "cloned_from": "ql_v5",
+      "best_rate": 127.1,
+      "worst_rate": 76.8,
+      "gap": 50.3,
+      "generation": 6,
+      "threshold": 45.4
+    },
+    {
+      "round": 11,
+      "population": "Q-Learn",
+      "replaced": "ql_v4",
+      "cloned_from": "ql_v11",
+      "best_rate": 83.6,
+      "worst_rate": 11.5,
+      "gap": 115.6,
+      "generation": 6,
+      "threshold": 45.4
+    },
+    {
+      "round": 11,
+      "population": "Q-Learn",
+      "replaced": "ql_v6",
+      "cloned_from": "ql_v5",
+      "best_rate": 127.1,
+      "worst_rate": 3.0,
+      "gap": 124.1,
+      "generation": 4,
+      "threshold": 45.4
+    },
+    {
+      "round": 12,
+      "population": "Q-Learn",
+      "replaced": "ql_v4",
+      "cloned_from": "ql_v5",
+      "best_rate": 174.7,
+      "worst_rate": 103.1,
+      "gap": 71.6,
+      "generation": 7,
+      "threshold": 44.0
+    },
+    {
+      "round": 12,
+      "population": "Q-Learn",
+      "replaced": "ql_v6",
+      "cloned_from": "ql_v12",
+      "best_rate": 147.9,
+      "worst_rate": 63.2,
+      "gap": 111.5,
+      "generation": 5,
+      "threshold": 44.0
+    },
+    {
+      "round": 12,
+      "population": "Q-Learn",
+      "replaced": "ql_v11",
+      "cloned_from": "ql_v5",
+      "best_rate": 174.7,
+      "worst_rate": 13.4,
+      "gap": 161.3,
+      "generation": 2,
+      "threshold": 44.0
+    },
+    {
+      "round": 13,
+      "population": "Q-Learn",
+      "replaced": "ql_v5",
+      "cloned_from": "ql_v11",
+      "best_rate": 60.6,
+      "worst_rate": 21.9,
+      "gap": 52.6,
+      "generation": 5,
+      "threshold": 42.5
+    },
+    {
+      "round": 13,
+      "population": "Q-Learn",
+      "replaced": "ql_v6",
+      "cloned_from": "ql_v4",
+      "best_rate": 74.5,
+      "worst_rate": -16.5,
+      "gap": 91.0,
+      "generation": 6,
+      "threshold": 42.5
+    }
+  ],
+  "standings": [
+    {
+      "label": "ql_v4",
+      "type": "qlearn",
+      "hands": 25397,
+      "total_bb": 13307.2,
+      "bb_per_100": 52.4,
+      "generation": 7,
+      "parent": "ql_v5",
+      "best_rate": 103.1
+    },
+    {
+      "label": "ql_v5",
+      "type": "qlearn",
+      "hands": 25744,
+      "total_bb": 18150.4,
+      "bb_per_100": 70.5,
+      "generation": 5,
+      "parent": "ql_v11",
+      "best_rate": 174.7
+    },
+    {
+      "label": "ql_v6",
+      "type": "qlearn",
+      "hands": 25416,
+      "total_bb": 9517.7,
+      "bb_per_100": 37.4,
+      "generation": 6,
+      "parent": "ql_v4",
+      "best_rate": 148.2
+    },
+    {
+      "label": "ql_v11",
+      "type": "qlearn",
+      "hands": 25420,
+      "total_bb": 14402.5,
+      "bb_per_100": 56.7,
+      "generation": 2,
+      "parent": "ql_v5",
+      "best_rate": 125.9
+    },
+    {
+      "label": "ql_v12",
+      "type": "qlearn",
+      "hands": 25489,
+      "total_bb": 12646.9,
+      "bb_per_100": 49.6,
+      "generation": 6,
+      "parent": "ql_v5",
+      "best_rate": 147.9
+    },
+    {
+      "label": "ppo_v8",
+      "type": "ppo",
+      "hands": 0,
+      "total_bb": 0.0,
+      "bb_per_100": 0.0,
+      "generation": 0,
+      "parent": "",
+      "best_rate": 0.0
+    },
+    {
+      "label": "ppo_v9",
+      "type": "ppo",
+      "hands": 0,
+      "total_bb": 0.0,
+      "bb_per_100": 0.0,
+      "generation": 0,
+      "parent": "",
+      "best_rate": 0.0
+    },
+    {
+      "label": "ppo_v10",
+      "type": "ppo",
+      "hands": 0,
+      "total_bb": 0.0,
+      "bb_per_100": 0.0,
+      "generation": 0,
+      "parent": "",
+      "best_rate": 0.0
+    }
+  ]
+}

@@ -47,6 +47,53 @@ app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
 app.include_router(play.router, prefix="/api/play", tags=["play"])
 
 
+@app.get("/api/slumbot-log")
+async def get_slumbot_log(mode: str = "training"):
+    """Serve Slumbot benchmark hand logs."""
+    import json
+    LOG_MAP = {
+        "rl_v2": "slumbot_rl_v2_log.json",
+        "rl": "slumbot_rl_log.json",
+        "training": "slumbot_training_log.json",
+        "heuristic": "slumbot_log.json",
+    }
+    filename = LOG_MAP.get(mode, f"slumbot_{mode}_log.json")
+    log_path = PROJECT_ROOT / "data" / filename
+    if not log_path.exists():
+        return {"error": f"No {mode} log found.", "hands": []}
+    with open(log_path) as f:
+        return json.load(f)
+
+
+@app.get("/api/slumbot-logs")
+async def list_slumbot_logs():
+    """List available Slumbot session logs."""
+    import json
+    logs = []
+    # Auto-discover all slumbot log files
+    data_dir = PROJECT_ROOT / "data"
+    log_files = sorted(data_dir.glob("slumbot_*_log.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    for path in log_files:
+        name = path.stem.replace("slumbot_", "").replace("_log", "")
+        # Generate readable label from filename
+        label = name.replace("_", " ").replace("ql ", "Q-Learn ").replace("ppo ", "PPO ").replace("training", "Training")
+        if path.exists():
+            with open(path) as f:
+                d = json.load(f)
+            hands = d.get("hands", [])
+            n = len(hands)
+            total = sum(h.get("winnings_bb", 0) for h in hands)
+            logs.append({
+                "id": name,
+                "label": label,
+                "hands": n,
+                "total_bb": round(total, 1),
+                "bb_per_100": round(total / n * 100, 1) if n > 0 else 0,
+                "timestamp": d.get("config", {}).get("timestamp", ""),
+            })
+    return {"logs": logs}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("apps.api.main:app", host="0.0.0.0", port=8000, reload=True)

@@ -56,8 +56,9 @@ interface HandResponse {
   is_terminal: boolean;
   winner: string | null;
   message: string;
-  bot_action: { label: string; sizing?: string; rationale?: string } | null;
+  bot_action: { label: string; sizing?: string; rationale?: string; source?: string; q_values?: Record<string, number> } | null;
   action_log: string[];
+  session_id: string;
 }
 
 interface Advice {
@@ -119,9 +120,23 @@ export default function PlayPage() {
   const [loading, setLoading] = useState(false);
   const [raiseAmount, setRaiseAmount] = useState(0);
   const [showRaiseSlider, setShowRaiseSlider] = useState(false);
+  const [bots, setBots] = useState<{id: string; label: string; type: string; weights: string}[]>([]);
+  const [selectedBot, setSelectedBot] = useState("heuristic");
+  const [sessionId, setSessionId] = useState("");
+  const [handsPlayed, setHandsPlayed] = useState(0);
+  const [sessionBB, setSessionBB] = useState(0);
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Load available bots
+    fetch(`${API}/api/play/bots`).then(r => r.json()).then(d => {
+      setBots(d.bots || []);
+      // Default to first QL agent if available, else heuristic
+      const ql = (d.bots || []).find((b: any) => b.type === "ql" && b.label.includes("v5"));
+      if (ql) setSelectedBot(ql.id);
+    }).catch(() => {});
+
+    // Load CFR runs
     fetch(`${API}/api/runs`).then(r => r.json()).then(d => {
       const valid = (d.runs || []).filter((r: any) => r.status === "completed" && r.config?.game_type !== "kuhn");
       valid.sort((a: any, b: any) => (b.config?.n_iterations || 0) - (a.config?.n_iterations || 0));
@@ -148,16 +163,23 @@ export default function PlayPage() {
     setLoading(true);
     setShowRaiseSlider(false);
     try {
+      const bot = bots.find(b => b.id === selectedBot);
       const r = await fetch(`${API}/api/play/new-hand`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ run_id: runId }),
+        body: JSON.stringify({
+          run_id: runId,
+          bot_type: bot?.type || "heuristic",
+          weights_path: bot?.weights || "",
+          session_id: sessionId,
+        }),
       });
       const d: HandResponse = await r.json();
       setGame(d);
       setAdvice(null);
+      if (d.session_id && !sessionId) setSessionId(d.session_id);
       if (d.is_player_turn) fetchAdvice(d.hand_id);
     } finally { setLoading(false); }
-  }, [runId, fetchAdvice]);
+  }, [runId, fetchAdvice, selectedBot, bots, sessionId]);
 
   const act = useCallback(async (actionType: string, amount: number = 0) => {
     if (!game || game.is_terminal || !game.is_player_turn) return;
@@ -170,10 +192,26 @@ export default function PlayPage() {
       });
       const d: HandResponse = await r.json();
       setGame(d);
+      if (d.session_id && !sessionId) setSessionId(d.session_id);
       if (d.is_player_turn && !d.is_terminal) fetchAdvice(d.hand_id);
       else setAdvice(null);
+
+      // Track session stats when hand completes
+      if (d.is_terminal && d.winner) {
+        setHandsPlayed(p => p + 1);
+        // Fetch session stats from server
+        if (d.session_id) {
+          fetch(`${API}/api/play/sessions`).then(r => r.json()).then(s => {
+            const sess = (s.sessions || []).find((x: any) => x.id === d.session_id);
+            if (sess) {
+              setHandsPlayed(sess.hands);
+              setSessionBB(sess.total_bb);
+            }
+          }).catch(() => {});
+        }
+      }
     } finally { setLoading(false); }
-  }, [game, fetchAdvice]);
+  }, [game, fetchAdvice, sessionId]);
 
   // Find bet/raise action for slider
   const betRaiseAction = (game?.legal_actions || []).find(a => a.type === "bet" || a.type === "raise");
@@ -200,21 +238,41 @@ export default function PlayPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-3">
-        <span className="text-xs text-graphite-500">Strategy:</span>
-        <select value={runId} onChange={e => setRunId(e.target.value)}
-          className="px-3 py-1.5 rounded-lg bg-graphite-900 border border-graphite-800 text-sm text-white">
-          {runs.map(r => <option key={r.id} value={r.id}>{r.name || r.id}</option>)}
-        </select>
-        <button onClick={dealHand} disabled={loading || !runId}
-          className="px-5 py-1.5 rounded-lg bg-accent-blue text-white text-sm font-medium hover:bg-accent-blue/90 transition-colors disabled:opacity-50">
-          {!game ? "Deal Hand" : "New Hand"}
-        </button>
-        {game && (
-          <span className="text-xs text-graphite-500 ml-auto font-mono">
-            {game.is_terminal ? "COMPLETE" : game.street.toUpperCase()}
-            {!game.is_terminal && ` | Stacks: ${game.player_stack} / ${game.bot_stack}`}
-          </span>
+      {/* Session + Bot controls */}
+      <div className="card p-4 space-y-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-xs text-graphite-500">Bot:</span>
+          <select value={selectedBot} onChange={e => { setSelectedBot(e.target.value); }}
+            className="px-3 py-1.5 rounded-lg bg-graphite-900 border border-graphite-800 text-sm text-white max-w-[280px]">
+            {bots.map(b => <option key={b.id} value={b.id}>{b.label}</option>)}
+          </select>
+          <button onClick={() => { setSessionId(""); setHandsPlayed(0); setSessionBB(0); setGame(null); }}
+            className="px-4 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-medium hover:bg-emerald-500/20 transition-colors">
+            New Session
+          </button>
+          <button onClick={dealHand} disabled={loading}
+            className="px-5 py-1.5 rounded-lg bg-accent-blue text-white text-sm font-medium hover:bg-accent-blue/90 transition-colors disabled:opacity-50">
+            {!game ? "Deal Hand" : "New Hand"}
+          </button>
+          {game && (
+            <span className="text-xs text-graphite-500 ml-auto font-mono">
+              {game.is_terminal ? "COMPLETE" : (game.street || "").toUpperCase()}
+              {!game.is_terminal && ` | Stacks: ${(game.player_stack ?? 0).toFixed(0)} / ${(game.bot_stack ?? 0).toFixed(0)}`}
+            </span>
+          )}
+        </div>
+        {sessionId && (
+          <div className="flex items-center justify-between p-2 rounded-lg bg-graphite-800/40 border border-graphite-700/30">
+            <div className="flex items-center gap-4 text-xs">
+              <span className="text-graphite-400">Session <span className="font-mono text-graphite-300">{sessionId}</span></span>
+              <span className="text-graphite-500">Hands: <span className="font-mono text-white">{handsPlayed}</span></span>
+              <span className="text-graphite-500">Result: <span className={cn("font-mono font-bold", sessionBB >= 0 ? "text-emerald-400" : "text-red-400")}>{sessionBB >= 0 ? "+" : ""}{sessionBB.toFixed(1)}bb</span></span>
+            </div>
+            <a href="/dashboard/replayer" target="_blank"
+              className="text-xs text-accent-blue hover:text-accent-cyan transition-colors">
+              View in Replayer →
+            </a>
+          </div>
         )}
       </div>
 
@@ -233,7 +291,7 @@ export default function PlayPage() {
             <div className="text-center">
               <div className="text-[10px] text-graphite-500 uppercase tracking-widest mb-1">
                 Bot
-                <span className="ml-2 text-graphite-600 normal-case">{game.bot_stack.toFixed(0)} chips</span>
+                <span className="ml-2 text-graphite-600 normal-case">{(game.bot_stack ?? 0).toFixed(0)} chips</span>
                 {game.bot_action && !game.is_terminal && (
                   <span className="ml-2 text-amber-400 normal-case text-xs font-medium">{game.bot_action.label}</span>
                 )}
@@ -269,7 +327,7 @@ export default function PlayPage() {
                 {game.player_cards.map((c, i) => <CardView key={`player-${i}-${c}`} card={c} size="lg" />)}
               </div>
               <div className="text-[10px] text-graphite-500 uppercase tracking-widest mt-1">
-                You <span className="text-graphite-600 normal-case">{game.player_stack.toFixed(0)} chips</span>
+                You <span className="text-graphite-600 normal-case">{(game.player_stack ?? 0).toFixed(0)} chips</span>
               </div>
             </div>
 

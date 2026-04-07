@@ -1,0 +1,695 @@
+{
+  "summary": {
+    "hands_played": 20,
+    "total_bb": 113.4,
+    "bb_per_100": 567.0,
+    "win_count": 9,
+    "loss_count": 10,
+    "win_pct": 45.0,
+    "biggest_win": 50.0,
+    "biggest_loss": -50.0,
+    "running_total": [
+      50.0,
+      100.0,
+      124.7,
+      124.2,
+      174.2,
+      224.2,
+      274.2,
+      224.2,
+      223.7,
+      173.7,
+      123.7,
+      73.7,
+      92.8,
+      142.8,
+      114.4,
+      113.9,
+      63.9,
+      113.9,
+      113.4,
+      113.4
+    ]
+  },
+  "hands": [
+    {
+      "hand_number": 1,
+      "our_cards": [
+        "6d",
+        "Tc"
+      ],
+      "bot_cards": [
+        "9d",
+        "Th"
+      ],
+      "board_flop": [
+        "Kd",
+        "Kh",
+        "6s"
+      ],
+      "board_turn": "5d",
+      "board_river": "3s",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You calls 1.0",
+        "Bot bets 2.7",
+        "You calls 0.7",
+        "Bot checks",
+        "You bets 5.4",
+        "Bot calls 5.4",
+        "Bot checks",
+        "You bets 20.4",
+        "Bot calls 20.4",
+        "Bot checks",
+        "You bets 71.5",
+        "Bot calls 71.5"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 2,
+      "our_cards": [
+        "8d",
+        "5s"
+      ],
+      "bot_cards": [
+        "4h",
+        "6c"
+      ],
+      "board_flop": [
+        "3d",
+        "7d",
+        "Kd"
+      ],
+      "board_turn": "Ah",
+      "board_river": "8h",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 6.5",
+        "Bot raises to 12.2",
+        "You calls 5.7",
+        "Bot bets 24.4",
+        "You calls 24.4",
+        "Bot bets 49.0",
+        "You calls 49.0",
+        "Bot bets 14.4",
+        "You all-in 14.4"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 3,
+      "our_cards": [
+        "6c",
+        "6s"
+      ],
+      "bot_cards": [
+        "As",
+        "2c"
+      ],
+      "board_flop": [
+        "Td",
+        "Ah",
+        "Ks"
+      ],
+      "board_turn": "9c",
+      "board_river": "Kc",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 24.7,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 6.5",
+        "Bot raises to 12.2",
+        "You raises to 24.7",
+        "Bot raises to 49.4",
+        "You raises to 100.0",
+        "Bot folds"
+      ],
+      "final_pot": 149.4
+    },
+    {
+      "hand_number": 4,
+      "our_cards": [
+        "2d",
+        "8c"
+      ],
+      "bot_cards": [
+        "Td",
+        "3d"
+      ],
+      "board_flop": [
+        "4c",
+        "7c",
+        "8h"
+      ],
+      "board_turn": "4d",
+      "board_river": "5c",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -0.5,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You folds"
+      ],
+      "final_pot": 3.0
+    },
+    {
+      "hand_number": 5,
+      "our_cards": [
+        "Jh",
+        "Qc"
+      ],
+      "bot_cards": [
+        "Td",
+        "9c"
+      ],
+      "board_flop": [
+        "5c",
+        "Kh",
+        "Qd"
+      ],
+      "board_turn": "4d",
+      "board_river": "9h",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 8.0",
+        "Bot raises to 14.7",
+        "You raises to 22.7",
+        "Bot calls 8.0",
+        "Bot bets 45.4",
+        "You calls 45.4",
+        "Bot bets 31.9",
+        "You calls 31.9"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 6,
+      "our_cards": [
+        "9s",
+        "Ah"
+      ],
+      "bot_cards": [
+        "6h",
+        "7s"
+      ],
+      "board_flop": [
+        "8d",
+        "9h",
+        "7h"
+      ],
+      "board_turn": "Kh",
+      "board_river": "Th",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 8.0",
+        "Bot raises to 14.7",
+        "You raises to 22.7",
+        "Bot raises to 47.8",
+        "You calls 25.1",
+        "Bot checks",
+        "You bets 52.2",
+        "Bot calls 52.2"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 7,
+      "our_cards": [
+        "Ah",
+        "3c"
+      ],
+      "bot_cards": [
+        "Tc",
+        "8s"
+      ],
+      "board_flop": [
+        "5d",
+        "Ks",
+        "9d"
+      ],
+      "board_turn": "4d",
+      "board_river": "2h",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 6.5",
+        "Bot raises to 12.2",
+        "You calls 5.7",
+        "Bot bets 24.4",
+        "You calls 24.4",
+        "Bot bets 49.0",
+        "You calls 49.0",
+        "Bot bets 14.4",
+        "You all-in 14.4"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 8,
+      "our_cards": [
+        "Qs",
+        "3h"
+      ],
+      "bot_cards": [
+        "6h",
+        "Kd"
+      ],
+      "board_flop": [
+        "4s",
+        "Js",
+        "5d"
+      ],
+      "board_turn": "2s",
+      "board_river": "9s",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 8.0",
+        "Bot raises to 14.7",
+        "You raises to 100.0",
+        "Bot calls 85.3"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 9,
+      "our_cards": [
+        "8c",
+        "2d"
+      ],
+      "bot_cards": [
+        "4s",
+        "Qs"
+      ],
+      "board_flop": [
+        "Ac",
+        "5h",
+        "4c"
+      ],
+      "board_turn": "5s",
+      "board_river": "Tc",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -0.5,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You folds"
+      ],
+      "final_pot": 3.0
+    },
+    {
+      "hand_number": 10,
+      "our_cards": [
+        "7c",
+        "6c"
+      ],
+      "bot_cards": [
+        "Kc",
+        "3d"
+      ],
+      "board_flop": [
+        "2c",
+        "5d",
+        "Ks"
+      ],
+      "board_turn": "4d",
+      "board_river": "7s",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 8.0",
+        "Bot raises to 14.7",
+        "You calls 6.7",
+        "Bot bets 29.4",
+        "You calls 29.4",
+        "Bot checks",
+        "You checks",
+        "Bot bets 55.9",
+        "You calls 55.9"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 11,
+      "our_cards": [
+        "8s",
+        "Kc"
+      ],
+      "bot_cards": [
+        "Kh",
+        "Jc"
+      ],
+      "board_flop": [
+        "7h",
+        "3h",
+        "Qc"
+      ],
+      "board_turn": "5h",
+      "board_river": "7d",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 8.0",
+        "Bot raises to 14.7",
+        "You calls 6.7",
+        "Bot bets 29.4",
+        "You calls 29.4",
+        "Bot bets 55.9",
+        "You calls 55.9"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 12,
+      "our_cards": [
+        "Kh",
+        "Qd"
+      ],
+      "bot_cards": [
+        "Kd",
+        "Td"
+      ],
+      "board_flop": [
+        "Th",
+        "5h",
+        "Jd"
+      ],
+      "board_turn": "Ah",
+      "board_river": "8s",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 8.0",
+        "Bot raises to 14.7",
+        "You raises to 100.0",
+        "Bot calls 85.3"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 13,
+      "our_cards": [
+        "6h",
+        "8s"
+      ],
+      "bot_cards": [
+        "Td",
+        "4c"
+      ],
+      "board_flop": [
+        "Th",
+        "Qh",
+        "Jd"
+      ],
+      "board_turn": "9d",
+      "board_river": "2h",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 19.1,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 8.0",
+        "Bot raises to 14.7",
+        "You calls 6.7",
+        "Bot checks",
+        "You checks",
+        "Bot checks",
+        "You bets 23.6",
+        "Bot calls 23.6",
+        "Bot checks",
+        "You bets 61.7",
+        "Bot folds"
+      ],
+      "final_pot": 138.3
+    },
+    {
+      "hand_number": 14,
+      "our_cards": [
+        "Qh",
+        "Td"
+      ],
+      "bot_cards": [
+        "7d",
+        "Ks"
+      ],
+      "board_flop": [
+        "4c",
+        "Tc",
+        "9s"
+      ],
+      "board_turn": "6d",
+      "board_river": "3d",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 5.0",
+        "Bot raises to 9.7",
+        "You calls 4.7",
+        "Bot bets 19.4",
+        "You calls 19.4",
+        "Bot bets 58.2",
+        "You calls 58.2",
+        "Bot bets 12.7",
+        "You calls 12.7"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 15,
+      "our_cards": [
+        "6h",
+        "5d"
+      ],
+      "bot_cards": [
+        "Js",
+        "4h"
+      ],
+      "board_flop": [
+        "7s",
+        "6s",
+        "3c"
+      ],
+      "board_turn": "Qs",
+      "board_river": "9s",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -28.4,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You calls 1.0",
+        "Bot bets 2.7",
+        "You calls 0.7",
+        "Bot bets 5.4",
+        "You calls 5.4",
+        "Bot checks",
+        "You bets 16.2",
+        "Bot raises to 48.6",
+        "You calls 32.4",
+        "Bot calls 0.0",
+        "Bot bets 43.3",
+        "You folds"
+      ],
+      "final_pot": 156.7
+    },
+    {
+      "hand_number": 16,
+      "our_cards": [
+        "3c",
+        "8h"
+      ],
+      "bot_cards": [
+        "5c",
+        "Ac"
+      ],
+      "board_flop": [
+        "5h",
+        "7d",
+        "2h"
+      ],
+      "board_turn": "4h",
+      "board_river": "5d",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -0.5,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You folds"
+      ],
+      "final_pot": 3.0
+    },
+    {
+      "hand_number": 17,
+      "our_cards": [
+        "4c",
+        "8c"
+      ],
+      "bot_cards": [
+        "6d",
+        "7h"
+      ],
+      "board_flop": [
+        "6h",
+        "Kd",
+        "9h"
+      ],
+      "board_turn": "9c",
+      "board_river": "7c",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 6.5",
+        "Bot raises to 12.2",
+        "You calls 5.7",
+        "Bot checks",
+        "You bets 87.8",
+        "Bot calls 87.8"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 18,
+      "our_cards": [
+        "Qh",
+        "5c"
+      ],
+      "bot_cards": [
+        "6d",
+        "9c"
+      ],
+      "board_flop": [
+        "5d",
+        "As",
+        "8c"
+      ],
+      "board_turn": "4h",
+      "board_river": "7c",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 8.0",
+        "Bot raises to 14.7",
+        "You calls 6.7",
+        "Bot bets 29.4",
+        "You raises to 85.3",
+        "Bot calls 55.9"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 19,
+      "our_cards": [
+        "Jd",
+        "2c"
+      ],
+      "bot_cards": [
+        "Qs",
+        "9h"
+      ],
+      "board_flop": [
+        "9d",
+        "Qh",
+        "9s"
+      ],
+      "board_turn": "Ad",
+      "board_river": "8s",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -0.5,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You folds"
+      ],
+      "final_pot": 3.0
+    },
+    {
+      "hand_number": 20,
+      "our_cards": [
+        "Qc",
+        "6c"
+      ],
+      "bot_cards": [
+        "Qs",
+        "9s"
+      ],
+      "board_flop": [
+        "5c",
+        "2h",
+        "Jh"
+      ],
+      "board_turn": "Ad",
+      "board_river": "2s",
+      "our_position": "BTN",
+      "winner": "tie",
+      "winnings_bb": 0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You calls 1.0",
+        "Bot bets 2.7",
+        "You calls 0.7",
+        "Bot bets 5.4",
+        "You calls 5.4",
+        "Bot checks",
+        "You checks",
+        "Bot checks",
+        "You checks"
+      ],
+      "final_pot": 16.2
+    }
+  ],
+  "config": {
+    "opponent": "Bot (ql)",
+    "blinds": "1/2",
+    "stack_bb": 100,
+    "timestamp": "2026-04-06 12:47:42"
+  }
+}

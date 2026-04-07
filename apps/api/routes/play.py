@@ -6,7 +6,10 @@ Server stores hand state keyed by hand_id — frontend sends only actions.
 
 from __future__ import annotations
 import uuid
+import json
+import time
 import random
+from pathlib import Path
 from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 
@@ -21,18 +24,62 @@ from packages.poker.sizing import (
 )
 from packages.solver.abstractions import get_hand_bucket_preflop, compute_flop_bucket
 from packages.solver.holdem_simplified import ACTION_NAMES, BET_FRACTIONS
+from packages.solver.rl_agent import (
+    QLearningAgent, extract_features as rl_extract_features,
+    get_legal_mask as rl_get_legal_mask,
+)
+from packages.solver.neural_agent import (
+    PPOAgent, extract_features as ppo_extract_features,
+    get_legal_mask as ppo_get_legal_mask,
+)
+from packages.solver.range_estimator import RangeEstimator
+
+_range_estimator = RangeEstimator()
 
 router = APIRouter()
 
 # Server-side hand storage
 _active_hands: dict[str, dict] = {}
 
+# Session logging for play vs bot
+_play_sessions: dict[str, dict] = {}  # session_id -> {hands: [], ...}
+
+# Cached Q-learning agents
+_ql_agents: dict[str, QLearningAgent] = {}
+
+
+def _get_ql_agent(weights_path: str) -> QLearningAgent | None:
+    """Load or get cached Q-learning agent."""
+    if weights_path not in _ql_agents:
+        agent = QLearningAgent()
+        if agent.load(weights_path):
+            _ql_agents[weights_path] = agent
+        else:
+            return None
+    return _ql_agents[weights_path]
+
+
+_ppo_agents: dict[str, PPOAgent] = {}
+
+def _get_ppo_agent(weights_path: str) -> PPOAgent | None:
+    """Load or get cached PPO agent."""
+    if weights_path not in _ppo_agents:
+        agent = PPOAgent()
+        if agent.load(weights_path):
+            _ppo_agents[weights_path] = agent
+        else:
+            return None
+    return _ppo_agents[weights_path]
+
 
 # ── Request models ───────────────────────────────────────────
 
 class NewHandRequest(BaseModel):
-    run_id: str
+    run_id: str = ""
     starting_stack: float = 100.0
+    bot_type: str = "heuristic"  # "heuristic" | "ql" | "ppo"
+    weights_path: str = ""       # path to QL/PPO weights file
+    session_id: str = ""         # empty = auto-create new session
 
 class PlayerActionRequest(BaseModel):
     hand_id: str
@@ -141,7 +188,7 @@ def _build_response(hand_id: str, hand_data: dict, bot_action_info: dict | None 
             else:
                 winner, message = "tie", "Showdown (insufficient board cards)."
 
-    return {
+    resp = {
         "hand_id": hand_id,
         "street": state.street.name.lower(),
         "pot": round(state.pot, 1),
@@ -160,7 +207,80 @@ def _build_response(hand_id: str, hand_data: dict, bot_action_info: dict | None 
         "message": message,
         "bot_action": bot_action_info,
         "action_log": log,
+        "session_id": hand_data.get("session_id", ""),
     }
+
+    # Log completed hands to session
+    if state.is_hand_complete and hand_data.get("session_id"):
+        sid = hand_data["session_id"]
+        if sid in _play_sessions:
+            hand_log = {
+                "hand_number": len(_play_sessions[sid]["hands"]) + 1,
+                "our_cards": [c.ascii for c in hand_data["player_cards"]],
+                "bot_cards": [c.ascii for c in hand_data["bot_cards"]],
+                "board_flop": [c.ascii for c in hand_data["flop"]],
+                "board_turn": hand_data["turn"].ascii,
+                "board_river": hand_data["river"].ascii,
+                "our_position": "BTN" if state.button_seat == player_idx else "BB",
+                "winner": winner,
+                "winnings_bb": round(state.players[player_idx].total_invested - state.players[bot_idx].total_invested, 1) if winner == "player" else round(-(state.players[player_idx].total_invested), 1) if winner == "bot" else 0,
+                "actions": log,
+                "final_pot": round(state.pot, 1),
+            }
+            # Compute actual winnings from pot
+            if winner == "player":
+                hand_log["winnings_bb"] = round((state.pot - state.players[player_idx].total_invested) / 2.0, 1)
+            elif winner == "bot":
+                hand_log["winnings_bb"] = round(-state.players[player_idx].total_invested / 2.0, 1)
+            else:
+                hand_log["winnings_bb"] = 0
+
+            _play_sessions[sid]["hands"].append(hand_log)
+
+            # Save session to disk
+            _save_play_session(sid)
+
+    return resp
+
+
+def _save_play_session(session_id: str):
+    """Save play session to disk for the replayer."""
+    if session_id not in _play_sessions:
+        return
+    session = _play_sessions[session_id]
+    hands = session["hands"]
+    n = len(hands)
+    total_bb = sum(h.get("winnings_bb", 0) for h in hands)
+    running = []
+    cum = 0
+    for h in hands:
+        cum += h.get("winnings_bb", 0)
+        running.append(round(cum, 1))
+
+    data = {
+        "summary": {
+            "hands_played": n,
+            "total_bb": round(total_bb, 1),
+            "bb_per_100": round(total_bb / max(n, 1) * 100, 1),
+            "win_count": sum(1 for h in hands if h.get("winnings_bb", 0) > 0),
+            "loss_count": sum(1 for h in hands if h.get("winnings_bb", 0) < 0),
+            "win_pct": round(sum(1 for h in hands if h.get("winnings_bb", 0) > 0) / max(n, 1) * 100, 1),
+            "biggest_win": round(max((h.get("winnings_bb", 0) for h in hands), default=0), 1),
+            "biggest_loss": round(min((h.get("winnings_bb", 0) for h in hands), default=0), 1),
+            "running_total": running,
+        },
+        "hands": hands,
+        "config": {
+            "opponent": f"Bot ({session.get('bot_type', 'heuristic')})",
+            "blinds": "1/2",
+            "stack_bb": 100,
+            "timestamp": session.get("started", ""),
+        },
+    }
+    path = Path("data") / f"slumbot_play_{session_id}_log.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
 
 
 def _get_bot_action(
@@ -168,9 +288,9 @@ def _get_bot_action(
     state: BettingState,
     request_app,
 ) -> tuple[ActionKind, float, dict | None]:
-    """Select the bot's action — uses trained strategy when available.
+    """Select the bot's action.
 
-    Priority: trained CFR strategy > equity-based fallback with proper logic.
+    Priority: Q-learning agent (if specified) > CFR strategy > equity fallback.
     Returns (action_kind, amount, display_info_or_None).
     """
     bot_cards = list(hand_data["bot_cards"])
@@ -181,6 +301,23 @@ def _get_bot_action(
         return ActionKind.CHECK, 0, None
 
     legal_kinds = {a.kind for a in legal}
+
+    # ── Try PPO neural network agent if specified ──────────────
+    weights_path = hand_data.get("weights_path", "")
+    if weights_path and hand_data.get("bot_type") == "ppo":
+        ppo = _get_ppo_agent(weights_path)
+        if ppo:
+            result = _ppo_agent_action(ppo, bot_cards, board, state, legal)
+            if result:
+                return result
+
+    # ── Try Q-learning agent if specified ────────────────────
+    if weights_path and hand_data.get("bot_type") == "ql":
+        agent = _get_ql_agent(weights_path)
+        if agent:
+            result = _ql_agent_action(agent, bot_cards, board, state, legal)
+            if result:
+                return result
 
     # ── Try trained strategy lookup ──────────────────────────
     orchestrator = request_app.state.orchestrator
@@ -193,6 +330,174 @@ def _get_bot_action(
 
     # ── Fallback: equity-based with proper pot odds ──────────
     return _equity_fallback(bot_cards, board, state, legal, legal_kinds)
+
+
+def _ppo_agent_action(
+    agent: PPOAgent,
+    bot_cards: list[Card],
+    board: list[Card],
+    state: BettingState,
+    legal: list[LegalAction],
+) -> tuple[ActionKind, float, dict | None] | None:
+    """Use PPO neural network agent to pick an action with range-adjusted equity."""
+    bot_idx = 1
+    player_idx = 0
+    pot = int(state.pot)
+    to_call = int(state.to_call)
+    invested = int(state.players[bot_idx].total_invested)
+    remaining = int(state.players[bot_idx].stack)
+    is_btn = (state.button_seat == bot_idx)
+    n_bets = sum(1 for r in state.action_log if r.street == state.street
+                 and r.kind in (ActionKind.BET, ActionKind.RAISE, ActionKind.ALL_IN))
+
+    # Build opponent action history for range estimation
+    opp_actions = []
+    for rec in state.action_log:
+        if rec.player_idx == player_idx and rec.kind in (ActionKind.BET, ActionKind.RAISE, ActionKind.CALL, ActionKind.CHECK, ActionKind.ALL_IN):
+            opp_actions.append({
+                "type": "raise" if rec.kind in (ActionKind.BET, ActionKind.RAISE, ActionKind.ALL_IN) else
+                        "call" if rec.kind == ActionKind.CALL else "check",
+                "street": rec.street.value,
+                "amount": rec.amount,
+                "pot": pot,
+            })
+
+    # Compute range-adjusted equity
+    range_eq = None
+    if opp_actions:
+        try:
+            range_eq = _range_estimator.compute_equity_vs_opponent(
+                bot_cards, board, opp_actions, state.street.value,
+                position="oop" if is_btn else "ip", n_samples=150,
+            )
+        except:
+            pass
+
+    features = ppo_extract_features(
+        bot_cards, board, pot, to_call, invested, remaining,
+        state.street.value, is_btn, n_bets,
+        range_adjusted_equity=range_eq,
+    )
+    legal_mask = ppo_get_legal_mask(to_call, remaining)
+
+    # Get action probabilities for display
+    probs = agent.get_action_probs(features, legal_mask)
+    action_idx, _, _ = agent.choose_action(features, legal_mask)
+
+    from packages.solver.neural_agent import ACTIONS as PPO_ACTIONS
+    prob_dict = {PPO_ACTIONS[i]: f"{probs[i]*100:.1f}%" for i in range(len(PPO_ACTIONS)) if legal_mask[i] > 0}
+
+    action_name = PPO_ACTIONS[action_idx]
+    legal_kinds = {a.kind for a in legal}
+
+    if action_name == "fold" and ActionKind.FOLD in legal_kinds:
+        return ActionKind.FOLD, 0, {"label": "Folds", "source": "ppo_agent", "probabilities": prob_dict}
+    if action_name == "check" and ActionKind.CHECK in legal_kinds:
+        return ActionKind.CHECK, 0, {"label": "Checks", "source": "ppo_agent", "probabilities": prob_dict}
+    if action_name == "call":
+        call = next((a for a in legal if a.kind == ActionKind.CALL), None)
+        if call:
+            return ActionKind.CALL, call.amount, {"label": f"Calls {call.amount:.1f}", "source": "ppo_agent", "probabilities": prob_dict}
+    if action_name == "all_in":
+        if ActionKind.RAISE in legal_kinds:
+            raise_a = next(a for a in legal if a.kind == ActionKind.RAISE)
+            return ActionKind.RAISE, raise_a.max_amount, {"label": f"All-in {raise_a.max_amount:.1f}", "source": "ppo_agent", "probabilities": prob_dict}
+        if ActionKind.BET in legal_kinds:
+            bet_a = next(a for a in legal if a.kind == ActionKind.BET)
+            return ActionKind.BET, bet_a.max_amount, {"label": f"All-in {bet_a.max_amount:.1f}", "source": "ppo_agent", "probabilities": prob_dict}
+
+    # Bet/raise sizing
+    frac = {"bet_small": 0.33, "bet_medium": 0.67, "bet_large": 1.0}.get(action_name, 0.5)
+    if ActionKind.BET in legal_kinds:
+        bet = next(a for a in legal if a.kind == ActionKind.BET)
+        amount = max(bet.min_amount, min(state.pot * frac, bet.max_amount))
+        return ActionKind.BET, round(amount, 1), {"label": f"Bets {amount:.1f}", "source": "ppo_agent", "probabilities": prob_dict}
+    if ActionKind.RAISE in legal_kinds:
+        raise_a = next(a for a in legal if a.kind == ActionKind.RAISE)
+        amount = max(raise_a.min_amount, min(state.highest_bet + state.pot * frac, raise_a.max_amount))
+        return ActionKind.RAISE, round(amount, 1), {"label": f"Raises to {amount:.1f}", "source": "ppo_agent", "probabilities": prob_dict}
+
+    return None
+
+
+def _ql_agent_action(
+    agent: QLearningAgent,
+    bot_cards: list[Card],
+    board: list[Card],
+    state: BettingState,
+    legal: list[LegalAction],
+) -> tuple[ActionKind, float, dict | None] | None:
+    """Use Q-learning agent to pick an action with range-adjusted equity."""
+    bot_idx = 1
+    player_idx = 0
+    pot = int(state.pot)
+    to_call = int(state.to_call)
+    invested = int(state.players[bot_idx].total_invested)
+    remaining = int(state.players[bot_idx].stack)
+    is_btn = (state.button_seat == bot_idx)
+    n_bets = sum(1 for r in state.action_log if r.street == state.street and r.kind in (ActionKind.BET, ActionKind.RAISE, ActionKind.ALL_IN))
+
+    features = rl_extract_features(
+        bot_cards, board, pot, to_call,
+        invested, remaining, state.street.value, is_btn, n_bets,
+    )
+
+    # Override equity with range-adjusted version
+    opp_actions = [
+        {"type": "raise" if r.kind in (ActionKind.BET, ActionKind.RAISE, ActionKind.ALL_IN) else
+                 "call" if r.kind == ActionKind.CALL else "check",
+         "street": r.street.value, "amount": r.amount, "pot": pot}
+        for r in state.action_log if r.player_idx == player_idx
+        and r.kind in (ActionKind.BET, ActionKind.RAISE, ActionKind.CALL, ActionKind.CHECK, ActionKind.ALL_IN)
+    ]
+    if opp_actions:
+        try:
+            range_eq = _range_estimator.compute_equity_vs_opponent(
+                bot_cards, board, opp_actions, state.street.value,
+                position="oop" if is_btn else "ip", n_samples=100,
+            )
+            features[0] = range_eq  # replace raw equity with range-adjusted
+        except:
+            pass
+
+    legal_mask = rl_get_legal_mask(to_call, remaining)
+    action_idx = agent.choose_action(features, legal_mask)
+
+    # Get probabilities for display
+    from packages.solver.rl_agent import ACTIONS
+    probs = agent.get_q_values(features)
+    probs_masked = {ACTIONS[i]: round(float(probs[i]), 2) for i in range(len(ACTIONS)) if legal_mask[i] > 0}
+
+    # Map RL action to BettingEngine action
+    rl_action = ["fold", "check", "call", "bet_small", "bet_medium", "bet_large"][action_idx]
+    legal_kinds = {a.kind for a in legal}
+
+    if rl_action == "fold" and ActionKind.FOLD in legal_kinds:
+        return ActionKind.FOLD, 0, {"label": "Folds", "source": "ql_agent", "q_values": probs_masked}
+
+    if rl_action == "check" and ActionKind.CHECK in legal_kinds:
+        return ActionKind.CHECK, 0, {"label": "Checks", "source": "ql_agent", "q_values": probs_masked}
+
+    if rl_action == "call":
+        call = next((a for a in legal if a.kind == ActionKind.CALL), None)
+        if call:
+            return ActionKind.CALL, call.amount, {"label": f"Calls {call.amount:.1f}", "source": "ql_agent", "q_values": probs_masked}
+
+    # Bet/raise sizing
+    if rl_action in ("bet_small", "bet_medium", "bet_large"):
+        frac = {"bet_small": 0.33, "bet_medium": 0.67, "bet_large": 1.0}[rl_action]
+
+        if ActionKind.BET in legal_kinds:
+            bet = next(a for a in legal if a.kind == ActionKind.BET)
+            amount = max(bet.min_amount, min(state.pot * frac, bet.max_amount))
+            return ActionKind.BET, round(amount, 1), {"label": f"Bets {amount:.1f}", "source": "ql_agent", "q_values": probs_masked}
+
+        if ActionKind.RAISE in legal_kinds:
+            raise_a = next(a for a in legal if a.kind == ActionKind.RAISE)
+            amount = max(raise_a.min_amount, min(state.highest_bet + state.pot * frac, raise_a.max_amount))
+            return ActionKind.RAISE, round(amount, 1), {"label": f"Raises to {amount:.1f}", "source": "ql_agent", "q_values": probs_masked}
+
+    return None  # fallback to other methods
 
 
 def _try_strategy_lookup(
@@ -488,6 +793,18 @@ async def new_hand(body: NewHandRequest, request: Request):
         bb=2.0,
     )
 
+    # Session management
+    session_id = body.session_id
+    if not session_id:
+        session_id = str(uuid.uuid4())[:8]
+    if session_id not in _play_sessions:
+        _play_sessions[session_id] = {
+            "id": session_id,
+            "started": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "bot_type": body.bot_type,
+            "hands": [],
+        }
+
     hand_data = {
         "state": state,
         "player_idx": 0,
@@ -498,6 +815,9 @@ async def new_hand(body: NewHandRequest, request: Request):
         "turn": turn_card,
         "river": river_card,
         "run_id": body.run_id,
+        "bot_type": body.bot_type,
+        "weights_path": body.weights_path,
+        "session_id": session_id,
     }
     _active_hands[hand_id] = hand_data
 
@@ -623,3 +943,64 @@ async def get_advice(body: AdvisorRequest, request: Request):
         "sizing_suggestions": _format_sizing(sizing),
         "legal_actions": _format_legal_actions(legal),
     }
+
+
+@router.get("/bots")
+async def list_bots():
+    """List available bot types and weight files."""
+    bots = [{"id": "heuristic", "label": "Heuristic (equity + SPR)", "type": "heuristic", "weights": ""}]
+
+    # Find all Q-learning weight files
+    for p in sorted(Path("data").glob("*.pkl")):
+        name = p.stem
+        if "qlearn" in name or "rl_agent" in name or "ql_v" in name:
+            try:
+                with open(p, "rb") as f:
+                    import pickle
+                    s = pickle.load(f)
+                hands = s.get("hands_trained", 0)
+                bots.append({
+                    "id": f"ql:{p.name}",
+                    "label": f"Q-Learn {name} ({hands} hands)",
+                    "type": "ql",
+                    "weights": str(p),
+                })
+            except:
+                pass
+
+    # Find PPO weight files
+    for p in sorted(Path("data").glob("*ppo*.pkl")):
+        name = p.stem
+        try:
+            with open(p, "rb") as f:
+                import pickle
+                s = pickle.load(f)
+            hands = s.get("hands_trained", 0)
+            updates = s.get("updates_done", 0)
+            bots.append({
+                "id": f"ppo:{p.name}",
+                "label": f"PPO Neural Net {name} ({hands} hands, {updates} updates)",
+                "type": "ppo",
+                "weights": str(p),
+            })
+        except:
+            pass
+
+    return {"bots": bots}
+
+
+@router.get("/sessions")
+async def list_play_sessions():
+    """List play sessions."""
+    sessions = []
+    for sid, s in _play_sessions.items():
+        n = len(s["hands"])
+        total = sum(h.get("winnings_bb", 0) for h in s["hands"])
+        sessions.append({
+            "id": sid,
+            "bot_type": s.get("bot_type", "heuristic"),
+            "hands": n,
+            "total_bb": round(total, 1),
+            "started": s.get("started", ""),
+        })
+    return {"sessions": sessions}

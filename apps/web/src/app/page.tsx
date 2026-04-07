@@ -1,4 +1,5 @@
 import { Hero } from "@/components/landing/hero";
+import { Leaderboard } from "@/components/landing/leaderboard";
 import { GameTheory } from "@/components/landing/game-theory";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { Architecture } from "@/components/landing/architecture";
@@ -9,6 +10,7 @@ export default function LandingPage() {
   return (
     <main className="relative">
       <Hero />
+      <Leaderboard />
       <GameTheory />
       <HowItWorks />
       <Architecture />

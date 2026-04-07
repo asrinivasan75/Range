@@ -10,6 +10,8 @@ const navItems = [
   { href: "/dashboard/runs", label: "Training Runs", icon: "▶" },
   { href: "/dashboard/explorer", label: "Explorer", icon: "◇" },
   { href: "/dashboard/strategy", label: "Strategy", icon: "⬡" },
+  { href: "/dashboard/replayer", label: "Hand Replayer", icon: "◉" },
+  { href: "/dashboard/architecture", label: "How It Works", icon: "⊞" },
   { href: "/dashboard/artifacts", label: "Artifacts", icon: "□" },
 ];
 

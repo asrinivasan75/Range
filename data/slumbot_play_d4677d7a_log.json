@@ -1,0 +1,123 @@
+{
+  "summary": {
+    "hands_played": 3,
+    "total_bb": -87.1,
+    "bb_per_100": -2903.3,
+    "win_count": 1,
+    "loss_count": 2,
+    "win_pct": 33.3,
+    "biggest_win": 12.9,
+    "biggest_loss": -50.0,
+    "running_total": [
+      12.9,
+      -37.1,
+      -87.1
+    ]
+  },
+  "hands": [
+    {
+      "hand_number": 1,
+      "our_cards": [
+        "Ad",
+        "Js"
+      ],
+      "bot_cards": [
+        "7c",
+        "3d"
+      ],
+      "board_flop": [
+        "7s",
+        "Kd",
+        "6c"
+      ],
+      "board_turn": "Ac",
+      "board_river": "8h",
+      "our_position": "BTN",
+      "winner": "player",
+      "winnings_bb": 12.9,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 5.0",
+        "Bot raises to 9.7",
+        "You raises to 17.0",
+        "Bot raises to 25.8",
+        "You raises to 100.0",
+        "Bot folds"
+      ],
+      "final_pot": 125.8
+    },
+    {
+      "hand_number": 2,
+      "our_cards": [
+        "3d",
+        "Kd"
+      ],
+      "bot_cards": [
+        "Js",
+        "9c"
+      ],
+      "board_flop": [
+        "8s",
+        "Jh",
+        "Ac"
+      ],
+      "board_turn": "Tc",
+      "board_river": "7s",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You calls 1.0",
+        "Bot bets 4.0",
+        "You calls 2.0",
+        "Bot bets 96.0",
+        "You calls 96.0"
+      ],
+      "final_pot": 200.0
+    },
+    {
+      "hand_number": 3,
+      "our_cards": [
+        "2d",
+        "Ts"
+      ],
+      "bot_cards": [
+        "Ks",
+        "9h"
+      ],
+      "board_flop": [
+        "5c",
+        "Jd",
+        "3s"
+      ],
+      "board_turn": "Kh",
+      "board_river": "4c",
+      "our_position": "BTN",
+      "winner": "bot",
+      "winnings_bb": -50.0,
+      "actions": [
+        "You bets 1.0",
+        "Bot bets 2.0",
+        "You raises to 6.5",
+        "Bot raises to 11.0",
+        "You calls 4.5",
+        "Bot bets 7.3",
+        "You calls 7.3",
+        "Bot bets 24.5",
+        "You calls 24.5",
+        "Bot bets 57.2",
+        "You calls 57.2"
+      ],
+      "final_pot": 200.0
+    }
+  ],
+  "config": {
+    "opponent": "Bot (ppo)",
+    "blinds": "1/2",
+    "stack_bb": 100,
+    "timestamp": "2026-04-06 12:43:34"
+  }
+}

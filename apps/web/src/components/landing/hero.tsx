@@ -90,9 +90,9 @@ export function Hero() {
           className="mt-20 grid grid-cols-3 gap-8 max-w-lg mx-auto"
         >
           {[
-            { value: "CFR", label: "Algorithm" },
-            { value: "2P", label: "Heads-Up" },
-            { value: "NLHE", label: "Game Type" },
+            { value: "#3", label: "Slumbot Leaderboard" },
+            { value: "+96", label: "BB/100 (5K hands)" },
+            { value: "+38", label: "Baseline BB/100" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="font-mono text-lg font-bold text-white">
